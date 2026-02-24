@@ -1,0 +1,5 @@
+title: Akash's Portfolio
+description: Web Developer | JavaScript Enthusiast | Learning & Sharing
+theme: minima
+plugins:
+  - jekyll-feed
