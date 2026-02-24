@@ -1,4 +1,3 @@
-document.addEventListener('DOMContentLoaded', () => {
 
 /* ===== CUSTOM CURSOR ===== */
 const cursor = document.querySelector('.cursor');
@@ -98,4 +97,3 @@ if (hamburger && mobileMenu) {
 /* ===== YEAR IN FOOTER ===== */
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
-});

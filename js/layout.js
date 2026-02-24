@@ -46,6 +46,8 @@ function injectNav(activePage) {
     </footer>
   `;
 
+  
+
   document.body.insertAdjacentHTML('afterbegin', navHTML);
   document.body.insertAdjacentHTML('beforeend', footerHTML);
 }
