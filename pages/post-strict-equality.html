@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Why You Should Always Use === in JavaScript — Akash Das Dhibar</title>
+  <meta name="description" content="A deep look at why strict equality matters in JavaScript, with real-world bug examples and best practices." />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+<body>
+
+  <div class="cursor"></div>
+  <div class="cursor-follower"></div>
+
+  <div class="mobile-menu">
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../works.html">Works</a></li>
+      <li><a href="../blog.html">Blog</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </div>
+
+  <nav>
+    <a href="../index.html" class="nav-logo">akash<span>.</span>dev</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../works.html">Works</a></li>
+      <li><a href="../blog.html" class="active">Blog</a></li>
+    </ul>
+    <a href="../index.html#contact" class="nav-cta">Say Hello</a>
+    <button class="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Post Hero -->
+  <div class="post-hero page">
+    <a href="../blog.html" class="post-back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+
+    <div class="post-meta">
+      <span class="blog-tag">JavaScript</span>
+      <span class="blog-date" style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim);">Feb 24, 2025</span>
+      <span class="blog-date" style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim);">· 7 min read</span>
+    </div>
+
+    <h1 class="post-title">
+      Why You Should Always Use <code style="font-size: 0.8em; background: var(--bg-3); color: var(--code); padding: 0.1em 0.3em; border-radius: 3px;">===</code> in JavaScript
+    </h1>
+
+    <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.8; margin-top: 1rem; max-width: 600px;">
+      JavaScript's equality operators confuse many developers. While == can feel "convenient," 
+      it hides subtle bugs through type coercion. Here's the definitive explanation — with 
+      real examples that have burned real people.
+    </p>
+  </div>
+
+  <!-- Post Content -->
+  <article class="post-content">
+
+    <p>
+      JavaScript has two equality operators: <code>==</code> (loose equality) and <code>===</code> (strict equality). 
+      They look similar, but their behavior differs dramatically. This post is about why you should 
+      almost always reach for <code>===</code> — and what happens when you don't.
+    </p>
+
+    <div class="callout">
+      <div class="callout-label">TL;DR</div>
+      <p>Always use <code>===</code> and <code>!==</code>. The mental overhead of remembering type coercion rules 
+      isn't worth it. Style guides from Airbnb, Google, and MDN all agree.</p>
+    </div>
+
+    <h2>1. The Core Difference: Type Coercion</h2>
+
+    <p>
+      The key distinction is this: <code>==</code> performs <strong>type coercion</strong> — JavaScript converts operands 
+      to the same type before comparing. <code>===</code> compares both <strong>value and type</strong> without any conversion.
+    </p>
+
+    <p>
+      This single difference causes most surprises. Let's see what happens in practice:
+    </p>
+
+    <div class="pre-label">javascript — type coercion gotchas</div>
+    <pre><code>console.log(0 == "0");          // true  ← string coerced to number
+console.log(0 == false);        // true  ← false → 0
+console.log("" == false);       // true  ← both become 0
+console.log(null == undefined); // true  ← special rule
+console.log(" \t\n" == 0);      // true  ← whitespace coerced to 0
+
+// With ===, all of these are false. As expected.
+console.log(0 === "0");         // false ✓
+console.log(0 === false);       // false ✓
+console.log(null === undefined);// false ✓</code></pre>
+
+    <p>
+      Every one of those <code>==</code> comparisons is technically "true." But are any of them <em>actually</em> equal 
+      in a way that makes sense for your code? Almost certainly not.
+    </p>
+
+    <h2>2. Real Bugs from the Wild</h2>
+
+    <p>
+      Here's the thing about type coercion bugs — they're not abstract. They show up in real applications, 
+      cause real production issues, and take real hours to debug. Here are three patterns I've seen trip people up:
+    </p>
+
+    <h3>Bug 1: Form input as a string</h3>
+    <p>
+      Form inputs always return strings. Always. Even <code>type="number"</code> gives you a string until 
+      you parse it. This trips up so many beginners:
+    </p>
+
+    <div class="pre-label">javascript — the form input trap</div>
+    <pre><code>// User typed "0" into a text input
+let userAge = "0";           // It's a string!
+
+if (userAge == 0) {
+  console.log("User is newborn or empty input"); // This runs! Bug.
+}
+
+// The === version makes the type explicit
+if (userAge === 0) {
+  // This never runs. Which is correct — userAge is a string.
+}
+
+// Proper approach: parse first, then compare
+let parsedAge = Number(userAge);
+if (parsedAge === 0) {
+  console.log("Age is zero"); // Now intentional
+}</code></pre>
+
+    <h3>Bug 2: The NaN trap</h3>
+    <p>
+      <code>NaN</code> is one of JavaScript's weird corners. It doesn't equal itself — not even with <code>===</code>. 
+      And with <code>==</code>, the confusion doubles:
+    </p>
+
+    <div class="pre-label">javascript — NaN is never equal to NaN</div>
+    <pre><code>let result = parseInt("abc");   // Returns NaN
+
+if (result == NaN) {            // false — NaN != NaN!
+  // This never runs — silent bug
+}
+
+if (result === NaN) {           // Also false! NaN !== NaN
+  // Still never runs
+}
+
+// Correct ways to check for NaN:
+if (isNaN(result)) { ... }      // true ✓ (but also coerces non-numbers)
+if (Number.isNaN(result)) { ... } // true ✓ (strict, no coercion)</code></pre>
+
+    <div class="callout">
+      <div class="callout-label">Key insight</div>
+      <p>Use <code>Number.isNaN()</code> over <code>isNaN()</code>. The global <code>isNaN()</code> coerces its argument first, 
+      so <code>isNaN("hello")</code> returns <code>true</code>. <code>Number.isNaN("hello")</code> correctly returns <code>false</code>.</p>
+    </div>
+
+    <h3>Bug 3: Falsy value surprises</h3>
+    <p>
+      JavaScript has six falsy values: <code>false</code>, <code>0</code>, <code>""</code>, <code>null</code>, <code>undefined</code>, and <code>NaN</code>. 
+      With <code>==</code>, many of these are considered equal to each other — which is almost never what you want:
+    </p>
+
+    <div class="pre-label">javascript — falsy comparisons</div>
+    <pre><code>let quantity = "";    // Empty form field
+
+if (quantity == 0) {
+  console.log("Out of stock"); // Runs! Because "" == 0
+}
+
+// With ===:
+if (quantity === 0) {
+  // Doesn't run. "" is not 0. Correct behavior.
+}
+
+// Even better — check for what you actually mean:
+if (quantity === "" || quantity === undefined) {
+  console.log("No quantity provided");
+}
+if (Number(quantity) === 0) {
+  console.log("Quantity is zero");
+}</code></pre>
+
+    <h2>3. The Mental Model Problem</h2>
+
+    <p>
+      Even if you <em>know</em> all the coercion rules — and there are many — using <code>==</code> forces anyone 
+      reading your code (including future you) to mentally simulate type coercion to understand what's happening. 
+      That's cognitive overhead that buys you nothing.
+    </p>
+
+    <p>
+      <code>===</code> is explicit. It says: "I want these to be exactly equal, same type, same value." 
+      There's no ambiguity, no hidden rules, no surprises.
+    </p>
+
+    <h2>4. What the Experts Say</h2>
+
+    <p>
+      This isn't just my opinion. Here's what major style guides recommend:
+    </p>
+
+    <div class="pre-label">From the Airbnb JavaScript Style Guide</div>
+    <pre><code>// ✗ bad
+if (a == b) { ... }
+
+// ✓ good  
+if (a === b) { ... }</code></pre>
+
+    <p>
+      MDN documentation consistently recommends strict equality. ESLint's <code>eqeqeq</code> rule (which most 
+      teams enable) enforces this automatically. Kyle Simpson in "You Don't Know JS" explains the coercion 
+      rules exhaustively — and even he recommends <code>===</code> when in doubt.
+    </p>
+
+    <h2>5. The Legitimate Uses of ==</h2>
+
+    <p>
+      There's one common pattern where <code>==</code> is actually useful — checking for <code>null</code> or <code>undefined</code> simultaneously:
+    </p>
+
+    <div class="pre-label">javascript — the one good use of ==</div>
+    <pre><code>// This checks for both null AND undefined
+if (value == null) {
+  console.log("value is null or undefined");
+}
+
+// Equivalent to:
+if (value === null || value === undefined) { ... }
+
+// The == version is shorter, and the intent is clear to experienced devs.
+// But I'd still recommend the explicit === version in most codebases
+// for consistency and readability.</code></pre>
+
+    <h2>Summary</h2>
+
+    <p>
+      The rule is simple: <strong>always use <code>===</code> and <code>!==</code></strong>. 
+      The one exception (<code>== null</code>) is narrow and optional — and worth the tradeoff of strict consistency.
+    </p>
+
+    <p>
+      Type coercion with <code>==</code> isn't just confusing — it actively hides bugs. Bugs that are hard to 
+      spot, hard to trace, and completely avoidable. The extra character is worth it every time.
+    </p>
+
+    <div class="callout">
+      <div class="callout-label">Personal note</div>
+      <p>I spent 4 hours once debugging a comparison issue in a form handler. It was <code>==</code>. 
+      That was the day I added ESLint's <code>eqeqeq</code> rule to every project I start.</p>
+    </div>
+
+    <!-- Author bio at end of post -->
+    <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; gap: 1.5rem; align-items: flex-start;">
+      <div style="width: 48px; height: 48px; background: var(--bg-3); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.2rem; font-weight: 800; color: var(--accent);">A</div>
+      <div>
+        <div style="font-weight: 700; margin-bottom: 0.3rem;">Akash Das Dhibar</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 0.8rem;">Web developer from West Bengal, India. Learning in public and writing about JS fundamentals.</div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <a href="https://github.com/SniperRavan" target="_blank" style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em;">GitHub</a>
+          <a href="https://www.linkedin.com/in/akash-das-dhibar-81983a2a1/" target="_blank" style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em;">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Next post navigation -->
+    <div style="margin-top: 3rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 2rem;">
+      <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);">← Previous</span>
+      <a href="../blog.html" style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em;">All posts →</a>
+    </div>
+
+  </article>
+
+  <footer>
+    <div class="footer-left">
+      © <span id="year"></span> Akash Das Dhibar — Built with <span>♥</span> & Jekyll
+    </div>
+    <div class="footer-right">
+      West Bengal, India &nbsp;·&nbsp; Open to opportunities
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
