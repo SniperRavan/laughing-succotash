@@ -26,3 +26,36 @@ console.log(0 == false);        // true  (false → 0)
 console.log("" == false);       // true
 console.log(null == undefined); // true  (special rule)
 console.log(" \t\n" == 0);      // true  (whitespace string coerced to 0)
+
+### 2. Predictability & Bug Prevention
+
+Type coercion with `==` often hides bugs that are extremely hard to spot — especially in larger codebases or when dealing with user input.
+
+Here are some real-world examples where `==` has caused painful bugs:
+
+```javascript
+// Example 1: User input from form (very common!)
+let userAge = "0";           // Comes as string from <input type="text">
+if (userAge == 0) {
+  console.log("User is newborn or empty input");   // This runs — but maybe you wanted to check for actual zero!
+}
+
+// Better:
+if (userAge === "0" || userAge === 0) { ... }   // Explicit — or better, parse it first!
+
+// Example 2: NaN comparisons (classic trap)
+let result = parseInt("abc");   // NaN
+if (result == NaN) {            // false — even NaN != NaN !
+  // This never runs — bug!
+}
+
+// Correct ways:
+if (isNaN(result)) { ... }      // or Number.isNaN(result)
+
+// Example 3: Falsy surprises in conditions
+let quantity = "";              // Empty input field
+if (quantity == 0) {            // true — treats empty string as 0
+  console.log("Out of stock");  // Wrong logic!
+}
+
+
