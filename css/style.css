@@ -926,12 +926,10 @@ footer {
   border-bottom: 1px solid var(--border);
 }
 
-.post-hero > * {
-  max-width: 100%;
-}
-
-.post-hero-content {
-  max-width: 800px;
+.post-hero,
+.post-content {
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .post-back {
