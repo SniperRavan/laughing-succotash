@@ -36,7 +36,7 @@ This site is my way of documenting progress, forcing myself to explain concepts 
 
 Feel free to connect:
 - GitHub: [@SniperRavan](https://github.com/SniperRavan)
-- LinkedIn: [linkedin.com/in/akash-das-dhibar-81983a2a1]
+- LinkedIn: www.linkedin.com/in/akash-das-dhibar-81983a2a1/
 - Email: **akashdasdhibar2003@gmail.com**
 
 Thanks for stopping by — let's build something cool together! 🚀
