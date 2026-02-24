@@ -54,23 +54,42 @@ const hamburger = document.querySelector('.hamburger');
 const mobileMenu = document.querySelector('.mobile-menu');
 
 if (hamburger && mobileMenu) {
-  hamburger.addEventListener('click', () => {
-    mobileMenu.classList.toggle('open');
-    const spans = hamburger.querySelectorAll('span');
-    if (mobileMenu.classList.contains('open')) {
-      spans[0].style.transform = 'rotate(45deg) translate(4.5px, 4.5px)';
-      spans[1].style.opacity = '0';
-      spans[2].style.transform = 'rotate(-45deg) translate(4.5px, -4.5px)';
-    } else {
-      spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
-    }
+  function openMenu() {
+    mobileMenu.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    const [s1, s2, s3] = hamburger.querySelectorAll('span');
+    s1.style.transform = 'rotate(45deg) translate(4.5px, 4.5px)';
+    s2.style.opacity = '0';
+    s3.style.transform = 'rotate(-45deg) translate(4.5px, -4.5px)';
+  }
+
+  function closeMenu() {
+    mobileMenu.classList.remove('open');
+    document.body.style.overflow = '';
+    hamburger.querySelectorAll('span').forEach(s => {
+      s.style.transform = '';
+      s.style.opacity = '';
+    });
+  }
+
+  hamburger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mobileMenu.classList.contains('open') ? closeMenu() : openMenu();
   });
 
+  // Close when a link is clicked
   mobileMenu.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-      mobileMenu.classList.remove('open');
-      hamburger.querySelectorAll('span').forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
-    });
+    link.addEventListener('click', closeMenu);
+  });
+
+  // Close when clicking the overlay background (outside the links)
+  mobileMenu.addEventListener('click', (e) => {
+    if (e.target === mobileMenu) closeMenu();
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileMenu.classList.contains('open')) closeMenu();
   });
 }
 
