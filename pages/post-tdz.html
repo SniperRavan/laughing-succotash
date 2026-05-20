@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Understanding TDZ in JavaScript — Akash Das Dhibar</title>
+  <meta name="description" content="A simple and practical explanation of the Temporal Dead Zone in JavaScript, with examples that even beginners can understand." />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+</head>
+<body>
+
+  <div class="cursor"></div>
+  <div class="cursor-follower"></div>
+
+  <div class="mobile-menu">
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../works.html">Works</a></li>
+      <li><a href="../blog.html">Blog</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </div>
+
+  <nav>
+    <a href="../index.html" class="nav-logo">akash<span>.</span>dev</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../works.html">Works</a></li>
+      <li><a href="../blog.html" class="active">Blog</a></li>
+    </ul>
+    <a href="../index.html#contact" class="nav-cta">Say Hello</a>
+    <button class="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="post-hero page">
+    <a href="../blog.html" class="post-back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Blog
+    </a>
+
+    <div class="post-meta">
+      <span class="blog-tag">JavaScript</span>
+      <span class="blog-date" style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim);">May 15, 2026</span>
+      <span class="blog-date" style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim);">· 6 min read</span>
+    </div>
+
+    <h1 class="post-title">
+      What Is the Temporal Dead Zone in JavaScript?
+    </h1>
+
+    <p style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.8; margin-top: 1rem; max-width: 600px;">
+      TDZ sounds scary, but the idea is simple: a variable can exist in a scope before it is ready to use.
+      In this post, we will explain it in the easiest way possible, with examples that beginners can follow.
+    </p>
+  </div>
+
+  <article class="post-content">
+
+    <p>
+      The Temporal Dead Zone, or TDZ, is the time between entering a scope and reaching the line where a
+      <code>let</code> or <code>const</code> variable is declared and initialized. During this time, the variable exists,
+      but you are not allowed to access it.
+    </p>
+
+    <div class="callout">
+      <div class="callout-label">Simple idea</div>
+      <p>
+        TDZ is JavaScript’s way of saying: “This variable is not ready yet, so do not touch it.”
+      </p>
+    </div>
+
+    <h2>1. Why TDZ exists</h2>
+
+    <p>
+      TDZ exists to catch mistakes early. If JavaScript allowed you to use a variable before it was initialized,
+      you could get confusing results and hard-to-find bugs. Instead, it throws a <code>ReferenceError</code> right away.
+    </p>
+
+    <p>
+      This makes your code safer and easier to understand, especially for beginners.
+    </p>
+
+    <h2>2. The easiest example</h2>
+
+    <div class="pre-label">javascript — TDZ in action</div>
+    <pre><code>console.log(message); // ReferenceError
+
+let message = "Hello!";</code></pre>
+
+    <p>
+      The line <code>console.log(message)</code> runs before the variable is initialized, so JavaScript stops with an error.
+      That error tells you the variable is in its TDZ.
+    </p>
+
+    <h2>3. How it differs from var</h2>
+
+    <p>
+      Variables declared with <code>var</code> do not have a TDZ in the same way. They are hoisted and initialized with
+      <code>undefined</code>, so reading them early does not throw an error.
+    </p>
+
+    <div class="pre-label">javascript — var vs let</div>
+    <pre><code>console.log(a); // undefined
+var a = 10;
+
+console.log(b); // ReferenceError
+let b = 10;</code></pre>
+
+    <p>
+      This is why many developers prefer <code>let</code> and <code>const</code>: they make mistakes easier to notice.
+    </p>
+
+    <h2>4. Scope matters</h2>
+
+    <p>
+      TDZ happens inside the current scope, such as a block, function, or module. Since <code>let</code> and
+      <code>const</code> are block-scoped, the TDZ usually appears inside the braces where they are declared.
+    </p>
+
+    <div class="pre-label">javascript — block scope example</div>
+    <pre><code>{
+  console.log(x); // ReferenceError
+  let x = 5;
+  console.log(x); // 5
+}</code></pre>
+
+    <p>
+      The first log fails because the variable is still in TDZ. The second log works because the declaration has already run.
+    </p>
+
+    <h2>5. A child-friendly analogy</h2>
+
+    <p>
+      Imagine a classroom where a teacher puts a name tag on a desk, but says no one can sit there until the bell rings.
+      The desk is already reserved, but it is not usable yet. That waiting time is TDZ.
+    </p>
+
+    <p>
+      In JavaScript, the bell is the line where the declaration runs.
+    </p>
+
+    <h2>6. Common mistakes</h2>
+
+    <p>
+      A very common mistake is using a variable inside its own declaration too early.
+      This can happen with nested blocks or repeated names.
+    </p>
+
+    <div class="pre-label">javascript — tricky mistake</div>
+    <pre><code>let total = 10;
+
+if (true) {
+  console.log(total); // ReferenceError if redeclared below in same block
+  let total = 20;
+}</code></pre>
+
+    <p>
+      This happens because the inner <code>let total</code> creates a new variable in that block, and it starts in TDZ.
+    </p>
+
+    <h2>7. The rule to remember</h2>
+
+    <p>
+      Use <code>let</code> and <code>const</code> after you declare them. Keep declarations near the top of their scope.
+      If you need a value later, assign it later, but do not read it before the declaration line.
+    </p>
+
+    <div class="callout">
+      <div class="callout-label">Best habit</div>
+      <p>
+        Declare first, use second. That one habit will save you from most TDZ errors.
+      </p>
+    </div>
+
+    <h2>Summary</h2>
+
+    <p>
+      TDZ is the period where a <code>let</code> or <code>const</code> variable exists but cannot be used yet.
+      It protects you from using variables too early and helps JavaScript catch bugs faster.
+    </p>
+
+    <p>
+      Once you remember this simple sentence — “declare first, use second” — TDZ becomes easy to understand.
+    </p>
+
+    <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); display: flex; gap: 1.5rem; align-items: flex-start;">
+      <div style="width: 48px; height: 48px; background: var(--bg-3); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.2rem; font-weight: 800; color: var(--accent);">A</div>
+      <div>
+        <div style="font-weight: 700; margin-bottom: 0.3rem;">Akash Das Dhibar</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 0.8rem;">Web developer from West Bengal, India. Learning in public and writing simple JavaScript explanations.</div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <a href="https://github.com/SniperRavan" target="_blank" style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em;">GitHub</a>
+          <a href="https://www.linkedin.com/in/akash-das-dhibar-81983a2a1/" target="_blank" style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em;">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Next post navigation -->
+    <div style="margin-top: 3rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 2rem;">
+      <a href="/pages/post-closures-in-javascript.html" style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim);">← Previous</a>
+      <a href="../blog.html" style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em;">All posts →</a>
+    </div>
+
+  </article>
+
+  <footer>
+    <div class="footer-left">
+      © <span id="year"></span> Akash Das Dhibar — Built with <span>♥</span> & Jekyll
+    </div>
+    <div class="footer-right">
+      West Bengal, India &nbsp;·&nbsp; Open to opportunities
+    </div>
+  </footer>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
